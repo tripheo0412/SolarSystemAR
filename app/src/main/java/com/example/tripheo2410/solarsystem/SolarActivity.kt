@@ -50,6 +50,10 @@ class SolarActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!DemoUtils.checkIsSupportedDeviceOrFinish(this)) {
+            // Not a supported device.
+            return
+        }
         setContentView(R.layout.activity_solar)
     }
 
