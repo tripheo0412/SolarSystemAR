@@ -10,6 +10,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 
 class SolarActivity : AppCompatActivity() {
     private val solarSettings = SolarSettings()
+    private var loadingMessageSnackbar: Snackbar? = null
     private var sunRenderable: ModelRenderable? = null
     private var mercuryRenderable: ModelRenderable? = null
     private var venusRenderable: ModelRenderable? = null
