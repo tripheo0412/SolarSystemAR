@@ -3,6 +3,11 @@ package com.example.tripheo2410.solarsystem
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.view.MotionEvent
+import com.google.ar.core.Frame
+import com.google.ar.core.Plane
+import com.google.ar.core.TrackingState
+import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -28,6 +33,25 @@ class SolarActivity : AppCompatActivity() {
         // Astronomical units to meters ratio. Used for positioning the planets of the solar system.
         private val AU_TO_METERS = 0.5f
     }
+    private fun tryPlaceSolarSystem(tap: MotionEvent?, frame: Frame): Boolean {
+        if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
+            for (hit in frame.hitTest(tap)) {
+                val trackable = hit.trackable
+                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
+                    // Create the Anchor.
+                    val anchor = hit.createAnchor()
+                    val anchorNode = AnchorNode(anchor)
+                    anchorNode.setParent(arSceneView!!.scene)
+                    val solarSystem = createSolarSystem()
+                    anchorNode.addChild(solarSystem)
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solar)
