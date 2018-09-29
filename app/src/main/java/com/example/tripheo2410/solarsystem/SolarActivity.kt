@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
@@ -119,6 +120,21 @@ class SolarActivity : AppCompatActivity() {
         }
 
         return false
+    }
+
+    override fun onRequestPermissionsResult(
+            requestCode: Int, permissions: Array<String>, results: IntArray) {
+        if (!DemoUtils.hasCameraPermission(this)) {
+            if (!DemoUtils.shouldShowRequestPermissionRationale(this)) {
+                // Permission denied with checking "Do not ask again".
+                DemoUtils.launchPermissionSettings(this)
+            } else {
+                Toast.makeText(
+                        this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
+                        .show()
+            }
+            finish()
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
