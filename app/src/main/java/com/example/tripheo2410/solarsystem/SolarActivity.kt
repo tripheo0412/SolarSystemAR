@@ -7,11 +7,18 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 
 class SolarActivity : AppCompatActivity() {
+    private val solarSettings = SolarSettings()
+    companion object {
+        private val RC_PERMISSIONS = 0x123
 
+        // Astronomical units to meters ratio. Used for positioning the planets of the solar system.
+        private val AU_TO_METERS = 0.5f
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solar)
     }
+
 
     private fun createPlanet(
             name: String,
