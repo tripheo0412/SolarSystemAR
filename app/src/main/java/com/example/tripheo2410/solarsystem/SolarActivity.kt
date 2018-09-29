@@ -5,9 +5,21 @@ import android.os.Bundle
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.rendering.ViewRenderable
 
 class SolarActivity : AppCompatActivity() {
     private val solarSettings = SolarSettings()
+    private var sunRenderable: ModelRenderable? = null
+    private var mercuryRenderable: ModelRenderable? = null
+    private var venusRenderable: ModelRenderable? = null
+    private var earthRenderable: ModelRenderable? = null
+    private var lunaRenderable: ModelRenderable? = null
+    private var marsRenderable: ModelRenderable? = null
+    private var jupiterRenderable: ModelRenderable? = null
+    private var saturnRenderable: ModelRenderable? = null
+    private var uranusRenderable: ModelRenderable? = null
+    private var neptuneRenderable: ModelRenderable? = null
+    private val solarControlsRenderable: ViewRenderable? = null
     companion object {
         private val RC_PERMISSIONS = 0x123
 
