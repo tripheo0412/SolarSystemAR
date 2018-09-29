@@ -19,15 +19,42 @@ class Planet(
         private val solarSettings: SolarSettings) : Node(), Node.OnTapListener {
 
     private var infoCard: Node? = null
-
-
+    private var planetVisual: RotatingNode? = null
 
     init {
         setOnTapListener(this)
     }
 
+    override fun onActivate() {
 
+        if (scene == null) {
+            throw IllegalStateException("Scene is null!")
+        }
 
+        if (infoCard == null) {
+            infoCard = Node()
+            infoCard!!.setParent(this)
+            infoCard!!.isEnabled = false
+            infoCard!!.localPosition = Vector3(0.0f, planetScale * INFO_CARD_Y_POS_COEFF, 0.0f)
+
+            ViewRenderable.builder()
+                    .setView(context, R.layout.planet_card_view)
+                    .build()
+                    .thenAccept { renderable ->
+                        infoCard!!.renderable = renderable
+                        val textView = renderable.view as TextView
+                        textView.text = planetName
+                    }
+                    .exceptionally { throwable -> throw AssertionError("Could not load plane card view.", throwable) }
+        }
+
+        if (planetVisual == null) {
+            planetVisual = RotatingNode(solarSettings, false)
+            planetVisual!!.setParent(this)
+            planetVisual!!.renderable = planetRenderable
+            planetVisual!!.localScale = Vector3(planetScale, planetScale, planetScale)
+        }
+    }
 
     override fun onUpdate(frameTime: FrameTime?) {
         if (infoCard == null) {
