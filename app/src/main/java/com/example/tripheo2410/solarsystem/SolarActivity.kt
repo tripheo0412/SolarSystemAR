@@ -2,6 +2,7 @@ package com.example.tripheo2410.solarsystem
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -29,6 +30,27 @@ class SolarActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solar)
+    }
+    private fun showLoadingMessage() {
+        if (loadingMessageSnackbar != null && loadingMessageSnackbar!!.isShownOrQueued) {
+            return
+        }
+
+        loadingMessageSnackbar = Snackbar.make(
+                this@SolarActivity.findViewById(android.R.id.content),
+                R.string.plane_finding,
+                Snackbar.LENGTH_INDEFINITE)
+        loadingMessageSnackbar!!.view.setBackgroundColor(-0x40cdcdce)
+        loadingMessageSnackbar!!.show()
+    }
+
+    private fun hideLoadingMessage() {
+        if (loadingMessageSnackbar == null) {
+            return
+        }
+
+        loadingMessageSnackbar!!.dismiss()
+        loadingMessageSnackbar = null
     }
 
     private fun createSolarSystem(): Node {
