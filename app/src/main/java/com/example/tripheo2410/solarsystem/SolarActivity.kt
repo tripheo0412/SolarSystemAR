@@ -7,6 +7,8 @@ import android.view.MotionEvent
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
+import com.google.ar.core.exceptions.CameraNotAvailableException
+import com.google.ar.core.exceptions.UnavailableException
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.ArSceneView
 import com.google.ar.sceneform.Node
@@ -15,6 +17,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.ViewRenderable
 
 class SolarActivity : AppCompatActivity() {
+    private var installRequested: Boolean = false
     private val solarSettings = SolarSettings()
     private var arSceneView: ArSceneView? = null
     private var loadingMessageSnackbar: Snackbar? = null
@@ -35,6 +38,62 @@ class SolarActivity : AppCompatActivity() {
         // Astronomical units to meters ratio. Used for positioning the planets of the solar system.
         private val AU_TO_METERS = 0.5f
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_solar)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (arSceneView == null) {
+            return
+        }
+
+        if (arSceneView!!.session == null) {
+            // If the session wasn't created yet, don't resume rendering.
+            // This can happen if ARCore needs to be updated or permissions are not granted yet.
+            try {
+                val session = DemoUtils.createArSession(this, installRequested)
+                if (session == null) {
+                    installRequested = DemoUtils.hasCameraPermission(this)
+                    return
+                } else {
+                    arSceneView!!.setupSession(session)
+                }
+            } catch (e: UnavailableException) {
+                DemoUtils.handleSessionException(this, e)
+            }
+
+        }
+
+        try {
+            arSceneView!!.resume()
+        } catch (ex: CameraNotAvailableException) {
+            DemoUtils.displayError(this, "Unable to get camera", ex)
+            finish()
+            return
+        }
+
+        if (arSceneView!!.session != null) {
+            showLoadingMessage()
+        }
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        if (arSceneView != null) {
+            arSceneView!!.pause()
+        }
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+        if (arSceneView != null) {
+            arSceneView!!.destroy()
+        }
+    }
+
     private fun tryPlaceSolarSystem(tap: MotionEvent?, frame: Frame): Boolean {
         if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
             for (hit in frame.hitTest(tap)) {
@@ -52,32 +111,6 @@ class SolarActivity : AppCompatActivity() {
         }
 
         return false
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_solar)
-    }
-    private fun showLoadingMessage() {
-        if (loadingMessageSnackbar != null && loadingMessageSnackbar!!.isShownOrQueued) {
-            return
-        }
-
-        loadingMessageSnackbar = Snackbar.make(
-                this@SolarActivity.findViewById(android.R.id.content),
-                R.string.plane_finding,
-                Snackbar.LENGTH_INDEFINITE)
-        loadingMessageSnackbar!!.view.setBackgroundColor(-0x40cdcdce)
-        loadingMessageSnackbar!!.show()
-    }
-
-    private fun hideLoadingMessage() {
-        if (loadingMessageSnackbar == null) {
-            return
-        }
-
-        loadingMessageSnackbar!!.dismiss()
-        loadingMessageSnackbar = null
     }
 
     private fun createSolarSystem(): Node {
@@ -138,5 +171,27 @@ class SolarActivity : AppCompatActivity() {
         planet.localPosition = Vector3(auFromParent * AU_TO_METERS, 0.0f, 0.0f)
 
         return planet
+    }
+
+    private fun showLoadingMessage() {
+        if (loadingMessageSnackbar != null && loadingMessageSnackbar!!.isShownOrQueued) {
+            return
+        }
+
+        loadingMessageSnackbar = Snackbar.make(
+                this@SolarActivity.findViewById(android.R.id.content),
+                R.string.plane_finding,
+                Snackbar.LENGTH_INDEFINITE)
+        loadingMessageSnackbar!!.view.setBackgroundColor(-0x40cdcdce)
+        loadingMessageSnackbar!!.show()
+    }
+
+    private fun hideLoadingMessage() {
+        if (loadingMessageSnackbar == null) {
+            return
+        }
+
+        loadingMessageSnackbar!!.dismiss()
+        loadingMessageSnackbar = null
     }
 }
