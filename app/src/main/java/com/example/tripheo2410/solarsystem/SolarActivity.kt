@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.MotionEvent
+import android.view.View
+import android.view.WindowManager
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
@@ -32,6 +34,12 @@ class SolarActivity : AppCompatActivity() {
     private var uranusRenderable: ModelRenderable? = null
     private var neptuneRenderable: ModelRenderable? = null
     private val solarControlsRenderable: ViewRenderable? = null
+
+    // True once scene is loaded
+    private var hasFinishedLoading = false
+
+    // True once the scene has been placed.
+    private var hasPlacedSolarSystem = false
     companion object {
         private val RC_PERMISSIONS = 0x123
 
@@ -111,6 +119,35 @@ class SolarActivity : AppCompatActivity() {
         }
 
         return false
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            // Standard Android full-screen functionality.
+            window
+                    .decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    private fun onSingleTap(tap: MotionEvent) {
+        if (!hasFinishedLoading) {
+            // We can't do anything yet.
+            return
+        }
+
+        val frame = arSceneView!!.arFrame
+        if (frame != null) {
+            if (!hasPlacedSolarSystem && tryPlaceSolarSystem(tap, frame)) {
+                hasPlacedSolarSystem = true
+            }
+        }
     }
 
     private fun createSolarSystem(): Node {
