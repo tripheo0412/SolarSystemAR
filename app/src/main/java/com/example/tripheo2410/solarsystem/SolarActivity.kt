@@ -25,6 +25,7 @@ import java.util.concurrent.CompletableFuture
 
 class SolarActivity : AppCompatActivity() {
     private var installRequested: Boolean = false
+    private var gestureDetector: GestureDetector? = null
     private val solarSettings = SolarSettings()
     private var arSceneView: ArSceneView? = null
     private var loadingMessageSnackbar: Snackbar? = null
