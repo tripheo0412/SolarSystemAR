@@ -8,6 +8,7 @@ import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.ArSceneView
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -15,6 +16,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 
 class SolarActivity : AppCompatActivity() {
     private val solarSettings = SolarSettings()
+    private var arSceneView: ArSceneView? = null
     private var loadingMessageSnackbar: Snackbar? = null
     private var sunRenderable: ModelRenderable? = null
     private var mercuryRenderable: ModelRenderable? = null
